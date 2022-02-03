@@ -1,7 +1,6 @@
 ﻿using Simple.RPC.Network;
 using Simple.RPC.Network.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -12,7 +11,7 @@ namespace Example
         private static string _host = "127.0.0.1";
         private static int _port = 9060;
 
-        static void Main(string[] args)
+        static void Main()
         {
             ApexDefaultSettings.DefaultSettings.MarkSerializable(typeof(TestClass)); //marking needed if u use custom classes
             
@@ -46,8 +45,8 @@ namespace Example
             var client = RpcClient<IHostedObject>.CreateProxy();
             client.Connect(_host, _port);
 
-            var someInt = client.Proxy.GetInt();
-            var someClass = client.Proxy.GetTestClass();
+            client.Proxy.GetInt();
+            client.Proxy.GetTestClass();
         }
 
         private static async void TestAsync()
@@ -55,63 +54,8 @@ namespace Example
             var client = RpcClient<IHostedObject>.CreateProxy();
             client.Connect(_host, _port);
 
-            var someStr = await client.Proxy.GetStringAsync();
-            var obj = await client.Proxy.GetObjectAsync() as TestClass;
+            await client.Proxy.GetStringAsync();
+            await client.Proxy.GetObjectAsync();
         }
-    }
-
-    public interface IHostedObject
-    {
-        int GetInt();
-        void Test();
-        List<string> GetStrings();
-        TestClass GetTestClass();
-        Task TestAsync();
-        Task<string> GetStringAsync();
-        Task<object> GetObjectAsync();
-    }
-
-    public class RpcHostedObject : IHostedObject
-    {
-        public int GetInt() { return 1; }
-
-        public Task<object> GetObjectAsync()
-        {
-            return Task.FromResult(new TestClass() as object);
-        }
-
-        public async Task<string> GetStringAsync()
-        {
-            await Task.Delay(1000);
-
-            return "string data";
-        }
-
-        public List<string> GetStrings()
-        {
-            return new List<string>
-            {
-                { "Test1" }, { "Test2" }
-            };
-        }
-
-        public TestClass GetTestClass()
-        {
-            return new TestClass();
-        }
-
-        public void Test()
-        {
-        }
-
-        public async Task TestAsync()
-        {
-            await Task.Delay(1000);
-        }
-    }
-
-    public class TestClass
-    {
-        public int SomeInt { get; set; } = 25;
     }
 }
